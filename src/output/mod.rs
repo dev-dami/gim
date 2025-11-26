@@ -1,6 +1,7 @@
 use crate::core::{MetricData, MetricValue};
 use serde_json;
 
+#[derive(Clone)]
 pub enum OutputFormat {
     Table,
     Json,
@@ -16,11 +17,11 @@ pub fn format_output(data: &MetricData, format: OutputFormat) -> String {
 }
 
 fn format_json(data: &MetricData) -> String {
-    // convert MetricData to a serializable format
+    // convert metricdata to a serializable format
     use std::collections::HashMap;
 
-    let mut output = HashMap::new();
-    output.insert("timestamp", format!("{:?}", data.timestamp));
+    let mut output = std::collections::HashMap::new();
+    output.insert("timestamp".to_string(), serde_json::Value::String(format!("{:?}", data.timestamp)));
 
     let mut metrics = std::collections::HashMap::new();
     for (key, value) in &data.metrics {
@@ -50,7 +51,7 @@ fn format_json(data: &MetricData) -> String {
         }
     }
     output.insert(
-        "metrics",
+        "metrics".to_string(),
         serde_json::Value::Object(metrics.into_iter().collect()),
     );
 
@@ -91,7 +92,6 @@ fn metric_value_to_string(value: &MetricValue) -> String {
         MetricValue::Float(f) => format!("{:.2}", f),
         MetricValue::String(s) => s.clone(),
         MetricValue::Boolean(b) => b.to_string(),
-        MetricValue::List(l) => format!("{:?}", l), // simple representation for lists thinking of more advanced
+        MetricValue::List(l) => format!("{:?}", l), // simple representation for lists
     }
 }
-

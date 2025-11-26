@@ -45,7 +45,7 @@ pub fn run() {
         match collector.collect() {
             Ok(data) => {
                 println!("=== {} Metrics ===", collector.name());
-                println!("{}", format_output(&data, format));
+                println!("{}", format_output(&data, format.clone()));
                 println!();
             }
             Err(e) => eprintln!("Error collecting {} metrics: {}", collector.name(), e),
