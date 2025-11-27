@@ -1,26 +1,31 @@
 # gim - GENERIC INFRASTRUCTURE MONITOR
 
-gmi-cli is a fast, high performance, modular system metrics and diagnostics CLI tool written in Rust.
+gim is a fast, high-performance, modular system metrics and diagnostics CLI tool written in Rust.
 
-# why - use cases
-- Monitoring system resources such as CPU, memory, disk usage, network traffic, and more.
-- Diagnosing issues with system performance and stability.
-- Gathering metrics for performance analysis and optimization.
-- Providing insights into system health and performance trends.
-- Automating routine tasks and alerts for system monitoring.
+## Features
 
-# planned features
-- CPU, memory, disk, and network metric collectors  
-- Unified MetricCollector trait for easy module additions  
-- JSON, table, and raw output modes  
-- Optional ratatui-based live dashboard  
-- JSON config support
+- **Modular Design**: Easy to extend with new metric collectors
+- **Multiple Output Formats**: JSON, table, and raw output modes
+- **Real-time Metrics**: CPU and memory usage statistics
+- **Clean Architecture**: Well-structured codebase for easy maintenance
 
-# Build & Run
+## Use Cases
+
+- Monitor system resources (CPU, memory, disk, network)
+- Diagnose performance issues
+- Gather metrics for analysis
+- Track system health trends
+
+## Installation & Usage
+
+### Build from Source
 
 ```bash
+# Clone the repository
+git clone https://github.com/your-repo/gim.git
+
 # Build the project
-cargo build
+cargo build --release
 
 # Run with default settings
 cargo run
@@ -35,16 +40,27 @@ cargo run -- --output raw
 cargo run -- --module cpu --output json
 ```
 
-# Current Features
--  CPU metric collection (usage, core count)
--  Memory metric collection (usage, available/free/used, swap)
--  Unified MetricCollector trait for modules
--  Multiple output formats (JSON, table, raw)
--  CLI argument parsing with clap
--  Basic architecture with core, modules, and output components
+## Current Capabilities
 
-# Next Steps
+- **CPU Metrics**: Usage percentage, core count
+- **Memory Metrics**: Total, used, free, available memory and swap
+- **Output Options**: JSON, formatted table, or raw key-value pairs
+
+## Planned Features
+
 - Disk and network metric collectors
-- TUI dashboard implementation
+- TUI dashboard with ratatui
 - Configuration file support
 - Live monitoring capabilities
+
+## Documentation
+
+- [API Documentation](docs/api.md)
+- [Architecture](docs/architecture.md)
+- [Modules Guide](docs/modules.md)
+- [Extending Guide](docs/extending.md)
+- [Contributing](CONTRIBUTING.md)
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
