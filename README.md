@@ -17,3 +17,34 @@ gmi-cli is a fast, high performance, modular system metrics and diagnostics CLI 
 - JSON config support
 
 # Build & Run
+
+```bash
+# Build the project
+cargo build
+
+# Run with default settings
+cargo run
+
+# Run a specific module
+cargo run -- --module cpu
+cargo run -- --module memory
+
+# Use different output formats
+cargo run -- --output json
+cargo run -- --output raw
+cargo run -- --module cpu --output json
+```
+
+# Current Features
+-  CPU metric collection (usage, core count)
+-  Memory metric collection (usage, available/free/used, swap)
+-  Unified MetricCollector trait for modules
+-  Multiple output formats (JSON, table, raw)
+-  CLI argument parsing with clap
+-  Basic architecture with core, modules, and output components
+
+# Next Steps
+- Disk and network metric collectors
+- TUI dashboard implementation
+- Configuration file support
+- Live monitoring capabilities
