@@ -1,0 +1,14 @@
+{
+  "default_module": "cpu",
+  "default_output": "table",
+  "refresh_interval": 1000,
+  "modules": {
+    "cpu": {
+      "enabled": true,
+      "include_memory": true
+    },
+    "memory": {
+      "enabled": true
+    }
+  }
+}
