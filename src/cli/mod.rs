@@ -1,6 +1,6 @@
 use clap::Parser;
 
-#[derive(Parser, Debug)]
+#[derive(Parser)]
 #[command(
     name = "gim",
     author = "Dev-Dami",
@@ -8,9 +8,11 @@ use clap::Parser;
     about = "System metrics CLI"
 )]
 pub struct Cli {
+    /// module to run (cpu, memory, etc.)
     #[arg(short, long)]
     pub module: Option<String>,
 
+    /// output format (json, table, raw)
     #[arg(short, long)]
     pub output: Option<String>,
 }

@@ -12,7 +12,7 @@ impl MemoryCollector {
 
 impl MetricCollector for MemoryCollector {
     fn collect(&self) -> Result<MetricData, Box<dyn std::error::Error>> {
-        let mut sys = System::new_with_specifics(RefreshKind::new().with_memory());
+        let sys = System::new_with_specifics(RefreshKind::everything().with_memory(sysinfo::MemoryRefreshKind::everything()));
 
         let mut metrics = HashMap::new();
 
@@ -25,7 +25,7 @@ impl MetricCollector for MemoryCollector {
         metrics.insert("used_swap_bytes".to_string(), MetricValue::from(sys.used_swap() as i64));
         metrics.insert("free_swap_bytes".to_string(), MetricValue::from(sys.free_swap() as i64));
 
-        // Calculate memory usage percentage
+        // calculate memory usage percentage
         let memory_percent = if sys.total_memory() > 0 {
             (sys.used_memory() as f64 / sys.total_memory() as f64) * 100.0
         } else {

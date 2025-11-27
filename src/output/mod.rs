@@ -17,8 +17,7 @@ pub fn format_output(data: &MetricData, format: OutputFormat) -> String {
 }
 
 fn format_json(data: &MetricData) -> String {
-    // convert metricdata to a serializable format
-    use std::collections::HashMap;
+    // convert MetricData to a serializable format
 
     let mut output = std::collections::HashMap::new();
     output.insert("timestamp".to_string(), serde_json::Value::String(format!("{:?}", data.timestamp)));

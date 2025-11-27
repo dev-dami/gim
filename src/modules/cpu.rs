@@ -13,10 +13,10 @@ impl CpuCollector {
 impl MetricCollector for CpuCollector {
     fn collect(&self) -> Result<MetricData, Box<dyn std::error::Error>> {
         let mut sys = System::new_with_specifics(
-            RefreshKind::new()
+            RefreshKind::everything()
                 .with_cpu(CpuRefreshKind::everything())
         );
-        sys.refresh_cpu();
+        sys.refresh_cpu_all();
 
         let mut metrics = HashMap::new();
 
@@ -35,8 +35,7 @@ impl MetricCollector for CpuCollector {
         );
 
         // Memory information (refreshing memory separately)
-        let mut mem_sys = System::new();
-        mem_sys.refresh_memory();
+        let mem_sys = System::new_with_specifics(RefreshKind::everything().with_memory(sysinfo::MemoryRefreshKind::everything()));
         metrics.insert(
             "total_memory_bytes".to_string(),
             MetricValue::from(mem_sys.total_memory() as i64),
