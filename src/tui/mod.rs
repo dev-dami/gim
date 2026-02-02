@@ -115,7 +115,102 @@ pub fn run_tui(engine: Engine, config: Config) -> Result<()> {
     Ok(())
 }
 
-fn draw_ui(_frame: &mut ratatui::Frame, _app: &App) {}
+fn draw_ui(frame: &mut ratatui::Frame, app: &App) {
+    let area = frame.area();
+    let theme = &app.config.theme;
+
+    let chrome_border = parse_color(&theme.chrome.border);
+    let chrome_title = parse_color(&theme.chrome.title);
+
+    let border_type = match app.config.tui.borders {
+        BorderStyle::None => ratatui::widgets::BorderType::Plain,
+        BorderStyle::Plain => ratatui::widgets::BorderType::Plain,
+        BorderStyle::Rounded => ratatui::widgets::BorderType::Rounded,
+    };
+
+    let chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Length(3),
+            Constraint::Min(10),
+            Constraint::Length(3),
+        ])
+        .split(area);
+
+    draw_header(frame, chunks[0], app, chrome_border, chrome_title, border_type);
+    draw_footer(frame, chunks[2], app, chrome_border, border_type);
+}
+
+fn draw_header(
+    frame: &mut ratatui::Frame,
+    area: Rect,
+    app: &App,
+    border_color: ratatui::style::Color,
+    title_color: ratatui::style::Color,
+    border_type: ratatui::widgets::BorderType,
+) {
+    let mut tabs: Vec<Span> = Vec::new();
+    if let Some(snapshot) = &app.snapshot {
+        for (i, (name, _)) in snapshot.modules.iter().enumerate() {
+            let module_color = module_fg_color(&app.config, name);
+            if i == app.selected_tab {
+                tabs.push(Span::styled(
+                    format!(" [{}] ", name.to_uppercase()),
+                    Style::default()
+                        .fg(module_color)
+                        .add_modifier(Modifier::BOLD | Modifier::UNDERLINED),
+                ));
+            } else {
+                tabs.push(Span::styled(
+                    format!("  {}  ", name.to_uppercase()),
+                    Style::default().fg(module_color),
+                ));
+            }
+        }
+    }
+
+    let header = Paragraph::new(Line::from(tabs)).block(
+        Block::default()
+            .borders(Borders::ALL)
+            .border_type(border_type)
+            .border_style(Style::default().fg(border_color))
+            .title(Span::styled(
+                " gim ",
+                Style::default()
+                    .fg(title_color)
+                    .add_modifier(Modifier::BOLD),
+            )),
+    );
+    frame.render_widget(header, area);
+}
+
+fn draw_footer(
+    frame: &mut ratatui::Frame,
+    area: Rect,
+    app: &App,
+    border_color: ratatui::style::Color,
+    border_type: ratatui::widgets::BorderType,
+) {
+    if !app.config.tui.show_help {
+        return;
+    }
+
+    let help = Paragraph::new(Line::from(vec![
+        Span::styled("q", Style::default().add_modifier(Modifier::BOLD)),
+        Span::raw(" quit  "),
+        Span::styled("←/→", Style::default().add_modifier(Modifier::BOLD)),
+        Span::raw(" switch tab  "),
+        Span::styled("Tab", Style::default().add_modifier(Modifier::BOLD)),
+        Span::raw(" next  "),
+    ]))
+    .block(
+        Block::default()
+            .borders(Borders::ALL)
+            .border_type(border_type)
+            .border_style(Style::default().fg(border_color)),
+    );
+    frame.render_widget(help, area);
+}
 
 fn module_theme<'a>(config: &'a Config, name: &str) -> &'a ModuleTheme {
     match name {
