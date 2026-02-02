@@ -26,7 +26,8 @@ impl MetricCollector for SystemCollector {
         if let Some(host) = System::host_name() {
             metrics.insert("hostname".to_string(), MetricValue::String(host));
         }
-        if let Some(arch) = System::cpu_arch() {
+        let arch = System::cpu_arch();
+        if !arch.is_empty() {
             metrics.insert("arch".to_string(), MetricValue::String(arch));
         }
 
