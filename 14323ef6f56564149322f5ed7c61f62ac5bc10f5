@@ -1,0 +1,51 @@
+src/tui/mod.rs
+  db1724179097b539 13
+  5556c1a2ad87b98d 141
+  8af83fcfd4726556 216-347
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.42",
+  "base_commit_sha": "14323ef6f56564149322f5ed7c61f62ac5bc10f5",
+  "prompts": {
+    "5556c1a2ad87b98d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3e3b9b450ffeSnnUoGUtFKot8X-b9ea5094-d053-4cc7-8dba-701e9f9205ee",
+        "model": "unknown"
+      },
+      "human_author": "dev-dami <damiade5banjo@gmail.com>",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "8af83fcfd4726556": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3e3b9b450ffeSnnUoGUtFKot8X-551d2231-8a48-49fd-9ea0-c34b2efe8d42",
+        "model": "unknown"
+      },
+      "human_author": "dev-dami <damiade5banjo@gmail.com>",
+      "messages": [],
+      "total_additions": 132,
+      "total_deletions": 0,
+      "accepted_lines": 132,
+      "overriden_lines": 0
+    },
+    "db1724179097b539": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3e3b9b450ffeSnnUoGUtFKot8X-addb4036-7224-4e82-bb71-2e248d7ec6fe",
+        "model": "unknown"
+      },
+      "human_author": "dev-dami <damiade5banjo@gmail.com>",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 1,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}
