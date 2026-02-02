@@ -1,0 +1,23 @@
+src/modules/system.rs
+  c80fbf0c94904fa6 29-30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.42",
+  "base_commit_sha": "918ed0ca192e41b1658285dfa94ede7c9693486c",
+  "prompts": {
+    "c80fbf0c94904fa6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3e3b9b450ffeSnnUoGUtFKot8X-b66ecdda-b1b3-4e02-baf8-b83ba584aa61",
+        "model": "unknown"
+      },
+      "human_author": "dev-dami <damiade5banjo@gmail.com>",
+      "messages": [],
+      "total_additions": 2,
+      "total_deletions": 1,
+      "accepted_lines": 2,
+      "overriden_lines": 0
+    }
+  }
+}
