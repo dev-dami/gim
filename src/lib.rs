@@ -1,57 +1,92 @@
 pub mod cli;
+pub mod config;
 pub mod core;
+pub mod engine;
+pub mod error;
 pub mod modules;
 pub mod output;
 pub mod tui;
 
-use crate::core::MetricCollector;
-use crate::modules::disk::DiskCollector;
-use crate::modules::{cpu::CpuCollector, memory::MemoryCollector};
-use crate::output::{OutputFormat, format_output};
+use crate::cli::{Cli, Command};
+use crate::config::load_config;
+use crate::engine::Engine;
+use crate::error::Result;
+use crate::output::{format_snapshot, OutputFormat};
 
-pub fn run() {
-    let args = cli::parse_args();
-
-    // get list of collectors based on args
-   let collectors: Vec<Box<dyn MetricCollector>> = match args.module.as_deref() {
-    Some("cpu") => vec![Box::new(CpuCollector::new())],
-    Some("memory") => vec![Box::new(MemoryCollector::new())],
-    Some("disk") => vec![Box::new(DiskCollector::new())],
-    Some(_) => {
-        eprintln!("Unknown module: {}", args.module.unwrap());
-        std::process::exit(1);
-    }
-    None => {
-        vec![
-            Box::new(CpuCollector::new()),
-            Box::new(MemoryCollector::new()),
-            Box::new(DiskCollector::new()),    // default me disk bhi add
-        ]
-    }
-};
-
-
-    // determine output format
-    let format = match args.output.as_deref() {
-        Some("json") => OutputFormat::Json,
-        Some("table") => OutputFormat::Table,
-        Some("raw") => OutputFormat::Raw,
-        Some(_) => {
-            eprintln!("Unknown output format: {}", args.output.unwrap());
-            std::process::exit(1);
-        }
-        None => OutputFormat::Table,
+pub fn run(args: Cli) -> Result<()> {
+    let config = if args.no_config {
+        config::Config::default()
+    } else {
+        load_config(args.config.as_deref())?
     };
 
-    // collect and display metrics
-    for collector in collectors {
-        match collector.collect() {
-            Ok(data) => {
-                println!("=== {} Metrics ===", collector.name());
-                println!("{}", format_output(&data, format.clone()));
-                println!();
+    match args.command {
+        Some(Command::Tui { module }) => {
+            let modules = resolve_modules(module, &config);
+            let engine = Engine::new(&modules)?;
+            tui::run_tui(engine, config)
+        }
+        Some(Command::Print {
+            module,
+            output,
+            watch,
+        }) => {
+            let modules = resolve_modules(module, &config);
+            let engine = Engine::new(&modules)?;
+            let format = match output {
+                Some(fmt) => OutputFormat::from(fmt),
+                None => OutputFormat::from_str_lossy(&config.print.output),
+            };
+
+            if watch || config.print.watch {
+                run_watch(engine, format, config.general.refresh_ms)
+            } else {
+                run_print_once(engine, format)
             }
-            Err(e) => eprintln!("Error collecting {} metrics: {}", collector.name(), e),
+        }
+        None => {
+            let modules = resolve_modules(None, &config);
+            let engine = Engine::new(&modules)?;
+            let format = OutputFormat::from_str_lossy(&config.print.output);
+            run_print_once(engine, format)
         }
     }
+}
+
+fn resolve_modules(cli_modules: Option<Vec<String>>, config: &config::Config) -> Vec<String> {
+    cli_modules.unwrap_or_else(|| config.general.default_modules.clone())
+}
+
+fn run_print_once(engine: Engine, format: OutputFormat) -> Result<()> {
+    let snapshot = engine.collect_once();
+    print!("{}", format_snapshot(&snapshot, &format));
+    Ok(())
+}
+
+fn run_watch(engine: Engine, format: OutputFormat, refresh_ms: u64) -> Result<()> {
+    let duration = std::time::Duration::from_millis(refresh_ms);
+
+    crossterm::terminal::enable_raw_mode()?;
+
+    let result = (|| -> Result<()> {
+        loop {
+            print!("\x1B[2J\x1B[1;1H");
+            let snapshot = engine.collect_once();
+            print!("{}", format_snapshot(&snapshot, &format));
+
+            if crossterm::event::poll(duration)? {
+                if let crossterm::event::Event::Key(key) = crossterm::event::read()? {
+                    if key.code == crossterm::event::KeyCode::Char('q')
+                        || key.code == crossterm::event::KeyCode::Esc
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+        Ok(())
+    })();
+
+    crossterm::terminal::disable_raw_mode()?;
+    result
 }
