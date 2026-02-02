@@ -1,0 +1,49 @@
+general:
+  refresh_ms: 1000
+  default_modules:
+    - system
+    - cpu
+    - memory
+    - disk
+    - network
+    - process
+
+print:
+  output: table
+  show_units: true
+  watch: false
+
+tui:
+  borders: rounded
+  show_help: true
+
+theme:
+  cpu:
+    label: "CPU"
+    fg: "cyan"
+    accent: "light_cyan"
+  memory:
+    label: "Memory"
+    fg: "green"
+    accent: "light_green"
+  disk:
+    label: "Disk"
+    fg: "yellow"
+    accent: "light_yellow"
+  network:
+    label: "Network"
+    fg: "magenta"
+    accent: "light_magenta"
+  process:
+    label: "Processes"
+    fg: "red"
+    accent: "light_red"
+  system:
+    label: "System"
+    fg: "blue"
+    accent: "light_blue"
+  chrome:
+    border: "gray"
+    title: "white"
+    header: "white"
+    error: "red"
