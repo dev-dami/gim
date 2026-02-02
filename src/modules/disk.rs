@@ -1,4 +1,4 @@
-use sysinfo::{DiskExt, System, SystemExt};
+use sysinfo::Disks;
 use std::collections::HashMap;
 use crate::core::{MetricCollector, MetricData, MetricValue};
 
@@ -12,28 +12,33 @@ impl DiskCollector {
 
 impl MetricCollector for DiskCollector {
     fn collect(&self) -> Result<MetricData, Box<dyn std::error::Error>> {
-        let mut sys = System::new_all();
-        sys.refresh_disks_list();
+        let disks = Disks::new_with_refreshed_list();
 
         let mut total: u64 = 0;
-        let mut used: u64 = 0;
         let mut free: u64 = 0;
 
-        for disk in sys.disks() {
+        for disk in disks.list() {
             total += disk.total_space();
             free += disk.available_space();
         }
 
-        used = total - free;
+        let used = total.saturating_sub(free);
+        let usage_percent = if total > 0 {
+            (used as f64 / total as f64) * 100.0
+        } else {
+            0.0
+        };
 
-        let mut map = HashMap::new();
-        map.insert("total".to_string(), MetricValue::Integer(total as i64));
-        map.insert("used".to_string(), MetricValue::Integer(used as i64));
-        map.insert("free".to_string(), MetricValue::Integer(free as i64));
+        let mut metrics = HashMap::new();
+        metrics.insert("total_bytes".to_string(), MetricValue::Integer(total as i64));
+        metrics.insert("used_bytes".to_string(), MetricValue::Integer(used as i64));
+        metrics.insert("free_bytes".to_string(), MetricValue::Integer(free as i64));
+        metrics.insert("usage_percent".to_string(), MetricValue::Float(usage_percent));
+        metrics.insert("disk_count".to_string(), MetricValue::Integer(disks.list().len() as i64));
 
         Ok(MetricData {
             timestamp: std::time::SystemTime::now(),
-            metrics: map,
+            metrics,
         })
     }
 
