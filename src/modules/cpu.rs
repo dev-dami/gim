@@ -2,65 +2,49 @@ use crate::core::{MetricCollector, MetricData, MetricValue};
 use std::collections::HashMap;
 use sysinfo::{CpuRefreshKind, System, RefreshKind};
 
-pub struct CpuCollector {}
+pub struct CpuCollector;
 
 impl CpuCollector {
     pub fn new() -> Self {
-        CpuCollector {}
+        CpuCollector
     }
 }
 
 impl MetricCollector for CpuCollector {
     fn collect(&self) -> Result<MetricData, Box<dyn std::error::Error>> {
         let mut sys = System::new_with_specifics(
-            RefreshKind::everything()
-                .with_cpu(CpuRefreshKind::everything())
+            RefreshKind::nothing()
+                .with_cpu(CpuRefreshKind::everything()),
         );
+
+        // Sleep briefly to allow CPU usage to be calculated accurately
+        std::thread::sleep(std::time::Duration::from_millis(200));
         sys.refresh_cpu_all();
 
         let mut metrics = HashMap::new();
 
-        // Total CPU usage
         let cpus = sys.cpus();
-        let avg_cpu_usage: f64 =
-            cpus.iter().map(|cpu| cpu.cpu_usage() as f64).sum::<f64>() / cpus.len() as f64;
+        let avg_usage: f64 = if cpus.is_empty() {
+            0.0
+        } else {
+            cpus.iter().map(|cpu| cpu.cpu_usage() as f64).sum::<f64>() / cpus.len() as f64
+        };
 
-        metrics.insert(
-            "cpu_usage_percent".to_string(),
-            MetricValue::from(avg_cpu_usage),
-        );
-        metrics.insert(
-            "cpu_count".to_string(),
-            MetricValue::from(cpus.len() as i64),
-        );
+        metrics.insert("cpu_usage_percent".to_string(), MetricValue::Float(avg_usage));
+        metrics.insert("cpu_count".to_string(), MetricValue::Integer(cpus.len() as i64));
 
-        // Memory information (refreshing memory separately)
-        let mem_sys = System::new_with_specifics(RefreshKind::everything().with_memory(sysinfo::MemoryRefreshKind::everything()));
-        metrics.insert(
-            "total_memory_bytes".to_string(),
-            MetricValue::from(mem_sys.total_memory() as i64),
-        );
-        metrics.insert(
-            "used_memory_bytes".to_string(),
-            MetricValue::from(mem_sys.used_memory() as i64),
-        );
-        metrics.insert(
-            "free_memory_bytes".to_string(),
-            MetricValue::from(mem_sys.free_memory() as i64),
-        );
+        let per_core: Vec<MetricValue> = cpus
+            .iter()
+            .enumerate()
+            .map(|(i, cpu)| {
+                MetricValue::String(format!("core_{}: {:.1}%", i, cpu.cpu_usage()))
+            })
+            .collect();
+        metrics.insert("per_core_usage".to_string(), MetricValue::List(per_core));
 
-        metrics.insert(
-            "total_swap_bytes".to_string(),
-            MetricValue::from(mem_sys.total_swap() as i64),
-        );
-        metrics.insert(
-            "used_swap_bytes".to_string(),
-            MetricValue::from(mem_sys.used_swap() as i64),
-        );
-        metrics.insert(
-            "free_swap_bytes".to_string(),
-            MetricValue::from(mem_sys.free_swap() as i64),
-        );
+        if let Some(first_cpu) = cpus.first() {
+            metrics.insert("cpu_brand".to_string(), MetricValue::String(first_cpu.brand().to_string()));
+        }
 
         Ok(MetricData {
             timestamp: std::time::SystemTime::now(),
