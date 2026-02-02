@@ -22,7 +22,7 @@ gim is a fast, high-performance, modular system metrics and diagnostics CLI tool
 
 ```bash
 # Clone the repository
-git clone [https://github.com/your-repo/gim.git](https://github.com/your-repo/gim.git)
+git clone [](https://github.com/dev-dami/gim)
 
 # Build the project
 cargo build --release
