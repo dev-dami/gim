@@ -1,0 +1,23 @@
+src/tui/mod.rs
+  533d696a05e0364e 118-212
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.42",
+  "base_commit_sha": "e8369ae3e38e6aeb1a5e19eb0c5f00c915508c19",
+  "prompts": {
+    "533d696a05e0364e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "opencode-transcript-ses_3e3b9b450ffeSnnUoGUtFKot8X-23b68d91-915c-456d-884a-f67be6096b9d",
+        "model": "unknown"
+      },
+      "human_author": "dev-dami <damiade5banjo@gmail.com>",
+      "messages": [],
+      "total_additions": 96,
+      "total_deletions": 1,
+      "accepted_lines": 95,
+      "overriden_lines": 0
+    }
+  }
+}
