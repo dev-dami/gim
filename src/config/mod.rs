@@ -4,6 +4,19 @@ use ratatui::style::Color;
 use serde::Deserialize;
 use std::path::{Path, PathBuf};
 
+#[derive(Debug, Deserialize, Clone, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum ThemeMode {
+    Terminal,
+    Custom,
+}
+
+impl Default for ThemeMode {
+    fn default() -> Self {
+        ThemeMode::Terminal
+    }
+}
+
 #[derive(Debug, Deserialize, Clone)]
 #[serde(default)]
 pub struct Config {
@@ -11,6 +24,7 @@ pub struct Config {
     pub print: PrintConfig,
     pub tui: TuiConfig,
     pub theme: ThemeConfig,
+    pub theme_mode: ThemeMode,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -34,6 +48,7 @@ pub struct TuiConfig {
     pub refresh_ms: Option<u64>,
     pub borders: BorderStyle,
     pub show_help: bool,
+    pub icons: bool,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -80,6 +95,7 @@ impl Default for Config {
             print: PrintConfig::default(),
             tui: TuiConfig::default(),
             theme: ThemeConfig::default(),
+            theme_mode: ThemeMode::default(),
         }
     }
 }
@@ -116,6 +132,7 @@ impl Default for TuiConfig {
             refresh_ms: None,
             borders: BorderStyle::Rounded,
             show_help: true,
+            icons: true,
         }
     }
 }
@@ -252,4 +269,24 @@ pub fn parse_color(color_str: &str) -> Color {
         }
         _ => Color::White,
     }
+}
+
+pub fn ansi_module_color(name: &str) -> Color {
+    match name {
+        "cpu" => Color::Cyan,
+        "memory" => Color::Green,
+        "disk" => Color::Yellow,
+        "network" => Color::Magenta,
+        "process" => Color::Red,
+        "system" => Color::Blue,
+        _ => Color::White,
+    }
+}
+
+pub fn ansi_chrome_border() -> Color {
+    Color::DarkGray
+}
+
+pub fn ansi_chrome_title() -> Color {
+    Color::White
 }

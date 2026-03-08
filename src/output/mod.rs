@@ -29,11 +29,25 @@ impl OutputFormat {
     }
 }
 
+fn module_icon(name: &str) -> &'static str {
+    match name {
+        "cpu" => "\u{f085}",       // nf-fa-cogs
+        "memory" => "\u{f2db}",    // nf-fa-microchip
+        "disk" => "\u{f0a0}",      // nf-fa-hdd_o
+        "network" => "\u{f0200}",  // nf-md-lan
+        "process" => "\u{f013}",   // nf-fa-cog
+        "system" => "\u{f04cb}",   // nf-md-monitor
+        _ => "●",
+    }
+}
+
 pub fn format_snapshot(snapshot: &MetricsSnapshot, format: &OutputFormat) -> String {
     let mut output = String::new();
     for (name, data) in &snapshot.modules {
-        output.push_str(&format!("=== {} ===\n", name.to_uppercase()));
+        let header = format!("{} {}", module_icon(name), name.to_uppercase());
+        output.push_str(&format!("╭── {} ──╮\n", header));
         output.push_str(&format_output(data, format));
+        output.push_str(&format!("╰── {} ──╯\n", header));
         output.push('\n');
     }
     output
